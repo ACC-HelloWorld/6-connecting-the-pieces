@@ -1,0 +1,15 @@
+**/__pycache__/
+.pytest_cache/
+*.pyc
+.coverage
+*.egg-info/
+.env
+my_secrets.py
+optimization_trace.png
+results.csv
+payload_dicts.json
+results.json
+ax_client_snapshot.json
+session_id.txt
+microcontroller_solution.py
+orchestrator_solution.py

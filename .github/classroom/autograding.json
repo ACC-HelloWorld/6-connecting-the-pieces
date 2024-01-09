@@ -1,0 +1,74 @@
+{
+    "tests": [
+        {
+            "name": "GitHub secrets test (env vars)",
+            "setup": "sudo -H pip3 install -r requirements.txt",
+            "run": ". ./setenv.sh && pytest credentials_test.py::test_env_vars_exist",
+            "input": "",
+            "output": "",
+            "comparison": "exact",
+            "timeout": 5,
+            "points": 1
+        },
+        {
+            "name": "GitHub secrets test (basic comms)",
+            "setup": "sudo -H pip3 install -r requirements.txt",
+            "run": ". ./setenv.sh && pytest credentials_test.py::test_basic_hivemq_communication",
+            "input": "",
+            "output": "",
+            "comparison": "exact",
+            "timeout": 5,
+            "points": 2
+        },
+        {
+            "name": "MongoDB Credentials (Data API)",
+            "setup": "sudo -H pip3 install -r requirements.txt",
+            "run": ". ./setenv.sh && pytest credentials_test.py::test_data_api",
+            "input": "",
+            "output": "",
+            "comparison": "exact",
+            "timeout": 5,
+            "points": 2
+        },
+        {
+            "name": "Microcontroller read test",
+            "setup": "sudo -H pip3 install -r requirements.txt",
+            "run": ". ./setenv.sh && pytest microcontroller_test.py::test_read_script",
+            "input": "",
+            "output": "",
+            "comparison": "exact",
+            "timeout": 5,
+            "points": 2
+        },
+        {
+            "name": "Microcontroller blink test",
+            "setup": "sudo -H pip3 install -r requirements.txt",
+            "run": ". ./setenv.sh && pytest microcontroller_test.py::test_blink_script",
+            "input": "",
+            "output": "",
+            "comparison": "exact",
+            "timeout": 5,
+            "points": 2
+        },
+        {
+            "name": "Microcontroller send and receive test",
+            "setup": "sudo -H pip3 install -r requirements.txt",
+            "run": ". ./setenv.sh && pytest microcontroller_test.py::test_send_and_receive",
+            "input": "",
+            "output": "",
+            "comparison": "exact",
+            "timeout": 5,
+            "points": 6
+        },
+        {
+            "name": "Orchestrator test",
+            "setup": "sudo -H pip3 install -r requirements.txt",
+            "run": ". ./setenv.sh && pytest orchestrator_test.py",
+            "input": "",
+            "output": "",
+            "comparison": "exact",
+            "timeout": 10,
+            "points": 15
+        }
+    ]
+}

@@ -1,0 +1,11 @@
+-e . # package from this repo
+numpy
+pandas
+paho-mqtt
+requests
+pymongo
+scikit-learn
+ax-platform
+kaleido # https://github.com/plotly/Kaleido/issues/134#issuecomment-1215791893, ==0.1.0.post1 is fix for Windows, but not cross-platform
+plotly
+pytest

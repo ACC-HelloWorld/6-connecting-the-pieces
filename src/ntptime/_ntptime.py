@@ -1,0 +1,6 @@
+host: str
+timeout: int
+
+
+def time(): ...
+def settime() -> None: ...
