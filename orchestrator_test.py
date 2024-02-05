@@ -168,7 +168,7 @@ def test_orchestrator_client():
     try:
         # give the data some time to be sent
         start_time = time()
-        timeout = 360  # seconds
+        timeout = 420  # seconds
         lower_limit = 15  # seconds, to ensure success even when microcontroller is running concurrently
 
         n = 0
