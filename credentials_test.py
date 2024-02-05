@@ -39,7 +39,7 @@ def test_env_vars_exist():
         connection_string_key,
     ]:
         assert (
-            env_var in os.environ
+            env_var in os.environ and os.environ[env_var] != ""
         ), f"Environment variable {env_var} does not exist. See README for instructions."
     default_broker = "248cc294c37642359297f75b7b023374.s2.eu.hivemq.cloud"
     assert (
