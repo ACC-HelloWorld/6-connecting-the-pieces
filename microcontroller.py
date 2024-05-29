@@ -7,7 +7,7 @@ import asyncio
 import ntptime
 from uio import StringIO
 from time import time, sleep
-import urequests as requests  # for MongoDB Data API
+import urequests_2 as requests  # for MongoDB Data API
 
 # WiFi
 from netman import connectWiFi
