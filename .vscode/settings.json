@@ -16,6 +16,14 @@
     "micropico.syncFolder": "",
     "micropico.openOnStart": true,
     "python.envFile": "${workspaceFolder}/.env",
+    "python.analysis.typeshedPaths": [
+        "~\\.micropico-stubs\\included",
+        "~\\.micropico-stubs\\included"
+    ],
+    "python.analysis.extraPaths": [
+        "~\\.micropico-stubs\\included",
+        "~\\.micropico-stubs\\included"
+    ],
     // "python.analysis.typeshedPaths": [
     //     ".vscode\\Pico-W-Stub"
     // ],
