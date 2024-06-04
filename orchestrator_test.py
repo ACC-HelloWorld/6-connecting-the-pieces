@@ -187,7 +187,7 @@ def test_orchestrator_client():
 
         client.loop_stop()
 
-        sleep(10)
+        sleep(30)
 
         def to_sorted_rounded_frozenset_list(dict_list):
             rounded_dict_list = []
