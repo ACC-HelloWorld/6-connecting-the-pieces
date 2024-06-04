@@ -144,4 +144,4 @@ See `postCreateCommand` from [`devcontainer.json`](.devcontainer/devcontainer.js
 ## Run command
 `pytest`
 
-You can also use the "Testing" sidebar extension to easily run individual tests.
+You can also use the "Testing" sidebar extension to easily run individual tests. NOTE: For local testing, you may need to run `orchestrator_test.py` directly as a Python script rather than via `pytest` due to the interaction between subprocesses and the testing framework. We recommend running `orchestrator.py` directly as an additional debugging and troubleshooting step.
