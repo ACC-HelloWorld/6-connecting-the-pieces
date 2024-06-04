@@ -1,4 +1,5 @@
 import os
+import re
 import pandas as pd
 from pathlib import Path
 
@@ -168,8 +169,9 @@ def test_orchestrator_client():
     try:
         # give the data some time to be sent
         start_time = time()
-        timeout = 420  # seconds
+        timeout = 360  # seconds
         lower_limit = 15  # seconds, to ensure success even when microcontroller is running concurrently
+        initial_check_limit = 30  # seconds
 
         n = 0
         while (
@@ -177,6 +179,13 @@ def test_orchestrator_client():
             and not os.path.exists(payload_dict_fname)
             and not os.path.exists(sensor_data_fname)
         ) or time() - start_time < lower_limit:
+            if (
+                time() - start_time > initial_check_limit
+                and len(received_payloads) == 0
+            ):
+                raise TimeoutError(
+                    f"No commands received within the initial check limit of {initial_check_limit} s. Ensure the microcontroller is running and connected to the MQTT broker and that credentials_test.py tests are passing."  # noqa: E501
+                )
             if len(received_payloads) > n:
                 print(f"Received {len(received_payloads)} commands.")
                 n = len(received_payloads)
