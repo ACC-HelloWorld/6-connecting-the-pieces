@@ -74,6 +74,14 @@ print(results_dict)
 
 The Bayesian optimization (BO) client will use a model-based approach to suggest new colors to try based on the results of previous experiments with the goal of minimizing the mismatch between the measured spectrum and the target spectrum (see below). Once the optimization budget has been exhausted, in our case by completing a fixed number of iterations, the BO client will return the best parameters as determined by the BO model. A visualization of the optimization process will show the lowest mismatch so far as a function of the number of iterations.
 
+##### Ax parameter configuration
+
+Use `"R"`, `"G"`, and `"B"` as the parameter names. Use 0 and 255 as lower and upper
+*integer* bounds, respectively. Note that Python interprets 0.0 and 255.0 as
+continuous variables ("floats"), and 0 and 255 as integers.
+
+See the ["Set up experiment"](https://ax.dev/tutorials/gpei_hartmann_service.html#2.-Set-up-experiment) section from the Ax Service API tutorial for additional context.
+
 ##### Mean absolute error 
 
 <!-- This probably should have been in Bayesian optimization module - best to move this portion out of the LightMixer class -->
