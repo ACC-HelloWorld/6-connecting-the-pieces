@@ -40,7 +40,7 @@ neopixels = NeoPixel(machine.Pin(28), 1)
 # Instantiate the Sensor class
 sensor = Sensor()
 
-# Description: Receive commands from HiveMQ and send dummy sensor data to HiveMQ
+# Description: Receive commands from HiveMQ and send sensor data to HiveMQ
 
 connectWiFi(SSID, PASSWORD, country="US")
 
@@ -87,7 +87,7 @@ config.update(
 )
 
 
-# Dummy function for running a color experiment
+# Function for running a color experiment
 def run_color_experiment(R, G, B):
     """
     Run a color experiment with the specified RGB values.

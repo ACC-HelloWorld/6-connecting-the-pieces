@@ -171,7 +171,7 @@ def test_orchestrator_client():
         start_time = time()
         timeout = 360  # seconds
         lower_limit = 15  # seconds, to ensure success even when microcontroller is running concurrently
-        initial_check_limit = 30  # seconds
+        initial_check_limit = 45  # seconds
 
         n = 0
         while (
