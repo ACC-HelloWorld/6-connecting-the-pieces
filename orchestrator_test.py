@@ -196,7 +196,7 @@ def test_orchestrator_client():
 
         client.loop_stop()
 
-        sleep(30)
+        sleep(60)
 
         def to_sorted_rounded_frozenset_list(dict_list):
             rounded_dict_list = []
@@ -316,6 +316,9 @@ def test_orchestrator_client():
         df = pd.json_normalize(results).set_index("_id").round(n_decimals)
 
         check_df = pd.read_csv(csv_fname).set_index("_id").round(n_decimals)
+
+        if "Unnamed: 0" in check_df.columns:
+            check_df = check_df.drop(columns=["Unnamed: 0"])
 
         # Select only the columns of df that are present in check_df, round, and drop duplicates
         df_selected = df[check_df.columns].round(n_decimals).drop_duplicates()
