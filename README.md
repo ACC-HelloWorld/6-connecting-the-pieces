@@ -119,6 +119,8 @@ The microcontroller should blink the LED with the color specified in the payload
 
 #### Hardware/software communication
 
+> NOTE: Recently, HiveMQ Cloud changed such that `hivemq-com-chain.der` (a Certificate Authority (CA) file) is not transferrable across different broker instances. The [latest `hivemq-com-chain.der` file](https://raw.githubusercontent.com/sparks-baird/self-driving-lab-demo/main/src/public_mqtt_sdl_demo/hivemq-com-chain.der) from [`self-driving-lab-demo`](https://github.com/sparks-baird/self-driving-lab-demo) will be hard-coded to the `self-driving-lab-demo` public test credentials (i.e., what is used in Module 1 - Running the Demo). However, this assignment requires you to create your own HiveMQ Cloud broker instance, so you will need to [generate a `hivemq-com-chain.der` file specific to your instance](https://colab.research.google.com/github/sparks-baird/self-driving-lab-demo/blob/main/notebooks/7.2.1-hivemq-openssl-certificate.ipynb) and upload it to your microcontroller.
+
 The microcontroller will receive a payload dictionary from the orchestrator, which includes the LED color to set and the experiment and session IDs. The microcontroller will then send a results dictionary back to the orchestrator, which includes the original payload and the sensor data that was acquired.
 
 ##### Payload dictionary
