@@ -1,5 +1,5 @@
 -e . # package from this repo
-numpy
+numpy<2.0 # temporary fix for ax-platform compatibility
 pandas
 paho-mqtt
 requests
