@@ -7,7 +7,7 @@ import asyncio
 import ntptime
 from uio import StringIO
 from time import time, sleep
-import urequests_2 as requests  # for MongoDB Data API
+import urequests as requests  # Changed to urequests for AWS API Gateway
 
 # WiFi
 from netman import connectWiFi
@@ -27,11 +27,8 @@ from my_secrets import (
     HIVEMQ_HOST,
     HIVEMQ_PASSWORD,
     HIVEMQ_USERNAME,
-    DATA_API_KEY,
-    ENDPOINT_BASE_URL,
-    CLUSTER_NAME,
-    DATABASE_NAME,
-    COLLECTION_NAME,
+    AWS_API_GATEWAY_URL,
+    AWS_API_KEY,
 )
 
 # Instantiate the LEDs with 1 pixel on Pin 28
@@ -121,16 +118,16 @@ def run_color_experiment(R, G, B):
 
 def log_experiment(document):
     """
-    Sends an experiment document to a specified MongoDB collection.
+    Sends an experiment document to AWS API Gateway.
 
-    This function attempts to send a document to a MongoDB collection via a POST
+    This function attempts to send a document to AWS API Gateway via a POST
     request.
 
     Parameters
     ----------
     document : dict
-        The document to be added to the MongoDB collection. This should be a
-        dictionary representing the experiment to be logged.
+        The document to be added. This should be a dictionary representing 
+        the experiment to be logged.
 
     Returns
     -------
@@ -155,7 +152,28 @@ def log_experiment(document):
     ... }
     >>> log_experiment(document)
     """
-    ...  # IMPLEMENT
+    
+    headers = {
+        "x-api-key": AWS_API_KEY,
+        "Content-Type": "application/json"
+    }
+    
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            response = requests.post(AWS_API_GATEWAY_URL, headers=headers, json=document)
+            if response.status_code == 200:
+                print("Experiment logged successfully")
+                return
+            else:
+                print(f"Failed to log experiment. Status code: {response.status_code}")
+        except Exception as e:
+            print(f"Error logging experiment (attempt {attempt + 1}/{max_retries}): {e}")
+        
+        if attempt < max_retries - 1:
+            sleep(2 ** attempt)  # Exponential backoff
+    
+    print("Failed to log experiment after multiple attempts")
 
 
 # MQTT Topics
@@ -187,7 +205,7 @@ async def messages(client):  # Respond to incoming messages
                 # }
                 ...  # IMPLEMENT
 
-                # Log the experiment to MongoDB
+                # Log the experiment to AWS API Gateway
                 log_experiment(payload_data)
 
         except Exception as e:
@@ -223,3 +241,4 @@ try:
     asyncio.run(main(client))
 finally:
     client.close()  # Prevent LmacRxBlk:1 errors
+

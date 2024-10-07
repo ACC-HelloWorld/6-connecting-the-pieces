@@ -1,28 +1,29 @@
 import os
+import json
 from paho.mqtt import client as mqtt_client
 import threading
 
-import json
-
-# HACK: hardcoded (instead of using credentials_test.py)
-username_key = "HIVEMQ_USERNAME"  # HACK: hardcoded
-password_key = "HIVEMQ_PASSWORD"  # HACK: hardcoded
-host_key = "HIVEMQ_HOST"  # HACK: hardcoded
-
+# Use more descriptive environment variable names
+USERNAME_KEY = "AWS_IOT_USERNAME"
+PASSWORD_KEY = "AWS_IOT_PASSWORD"
+HOST_KEY = "AWS_IOT_ENDPOINT"
 
 def hivemq_communication(outgoing_message, subscribe_topic, publish_topic):
-    broker = os.environ[host_key]
-    username = os.environ[username_key]
-    password = os.environ[password_key]
-    # print(f"Connecting to {broker} with username {username} and password {password}")
+    broker = os.environ[HOST_KEY]
+    username = os.environ[USERNAME_KEY]
+    password = os.environ[PASSWORD_KEY]
 
-    received_messages = []  # avoid using nonlocal by using mutable data structure
+    received_messages = []
     message_received_event = threading.Event()
     connected_event = threading.Event()
 
     def on_connect(client, userdata, flags, rc):
-        client.subscribe(subscribe_topic, qos=2)
-        connected_event.set()
+        if rc == 0:
+            print("Connected to AWS IoT Core")
+            client.subscribe(subscribe_topic, qos=1)
+            connected_event.set()
+        else:
+            print(f"Failed to connect, return code {rc}")
 
     def on_message(client, userdata, message):
         received_message = json.loads(message.payload)
@@ -34,44 +35,37 @@ def hivemq_communication(outgoing_message, subscribe_topic, publish_topic):
     client.on_connect = on_connect
     client.on_message = on_message
 
-    client.tls_set(
-        tls_version=mqtt_client.ssl.PROTOCOL_TLS_CLIENT
-    )  # Enable TLS with specific version
-    client.connect(broker, port=8883)  # Connect to the broker on port 8883
+    # AWS IoT Core specific TLS configuration
+    client.tls_set(certfile=os.environ.get('AWS_IOT_CERTIFICATE'),
+                   keyfile=os.environ.get('AWS_IOT_PRIVATE_KEY'),
+                   ca_certs=os.environ.get('AWS_IOT_ROOT_CA'))
+
+    client.connect(broker, port=8883)
     client.loop_start()
 
-    connected_event.wait(timeout=10)  # Wait for the connection to be established
+    if not connected_event.wait(timeout=10):
+        raise ConnectionError("Failed to connect to AWS IoT Core")
 
-    client.publish(publish_topic, outgoing_message, qos=2)
+    client.publish(publish_topic, outgoing_message, qos=1)
 
-    message_received_event.wait(timeout=20)  # Wait for the message to be received
-
-    if not message_received_event.is_set():
+    if not message_received_event.wait(timeout=20):
         raise TimeoutError("No message received within the specified timeout")
 
     client.loop_stop()
 
-    assert (
-        len(received_messages) == 1
-    ), f"Expected 1 message, got {len(received_messages)}"
-    received_message = received_messages[0]
+    assert len(received_messages) == 1, f"Expected 1 message, got {len(received_messages)}"
+    return received_messages[0]
 
-    return received_message
-
-
+# Update the developer note
 """Developer note:
 
-Within a conda environment, you can run the following commands to set
-environment variables persistently in a way that can be read by
-os.getenv("VAR_NAME"). This helps while developing the repo locally
-instead of needing to run it on GitHub Codespaces.
+To set up AWS IoT Core credentials in your conda environment:
 
-```
-conda env config vars set HIVEMQ_USERNAME=your_username
-conda env config vars set HIVEMQ_PASSWORD=your_password
-conda env config vars set HIVEMQ_HOST=your_host
+conda env config vars set AWS_IOT_USERNAME=your_username
+conda env config vars set AWS_IOT_PASSWORD=your_password
+conda env config vars set AWS_IOT_ENDPOINT=your_aws_iot_endpoint
+conda env config vars set AWS_IOT_CERTIFICATE=/path/to/certificate.pem.crt
+conda env config vars set AWS_IOT_PRIVATE_KEY=/path/to/private.pem.key
+conda env config vars set AWS_IOT_ROOT_CA=/path/to/AmazonRootCA1.pem
 conda env config vars set COURSE_ID=your_course_id
-
-(or all in one line, e.g., conda env config vars set HIVEMQ_USERNAME=your_username HIVEMQ_PASSWORD=your_password HIVEMQ_HOST=your_host COURSE_ID=your_course_id)
-```
 """

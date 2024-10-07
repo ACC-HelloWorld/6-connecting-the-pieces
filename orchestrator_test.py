@@ -13,7 +13,10 @@ import threading
 
 from ax.service.ax_client import AxClient
 
-from pymongo.mongo_client import MongoClient
+import requests
+
+aws_api_gateway_url_key = "AWS_API_GATEWAY_URL"
+aws_api_key_key = "AWS_API_KEY"
 
 username_key = "HIVEMQ_USERNAME"
 password_key = "HIVEMQ_PASSWORD"
@@ -53,6 +56,18 @@ def run_color_experiment(R, G, B):
     }
     return sensor_data
 
+def get_results_from_api_gateway(session_id):
+    url = os.environ[aws_api_gateway_url_key]
+    headers = {
+        "x-api-key": os.environ[aws_api_key_key],
+        "Content-Type": "application/json"
+    }
+    params = {"session_id": session_id}
+    response = requests.get(url, headers=headers, params=params)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception(f"Failed to retrieve data from API Gateway. Status code: {response.status_code}")
 
 def test_orchestrator_client():
     """Pretend to be the microcontroller"""
@@ -284,35 +299,18 @@ def test_orchestrator_client():
             == to_sorted_rounded_frozenset_list(received_rgb_values)
         ), f"Mismatch between microcontroller RGB commands, orchestrator.py RGB commands, and received RGB commands. Microcontroller:\n{microcontroller_rgb_values}\n\nOrchestrator:\n{orchestrator_rgb_values}\n\nReceived:\n{received_rgb_values}"  # noqa: E501
 
-        # TODO: Check that entries pulled directly from MongoDB match results.csv (?)
-
-        database_name = os.environ["DATABASE_NAME"]
-        collection_name = os.environ["COLLECTION_NAME"]
-        connection_string = os.environ["CONNECTION_STRING"]
-
-        db_client = MongoClient(connection_string)
-
-        # Send a ping to confirm a successful connection
-        try:
-            db_client.admin.command("ping")
-            print("Pinged your deployment. You successfully connected to MongoDB!")
-        except Exception as e:
-            print(e)
-
-        db = db_client[database_name]
-        collection = db[collection_name]
 
         with open(session_id_fname) as f:
             session_id = f.read().strip()
 
         # get all results that have the same session ID as this run
-        results = list(collection.find({"session_id": session_id}))
+        results = get_results_from_api_gateway(session_id)
 
         assert (
             len(results) > 0
-        ), f"No MongoDB results found for session ID: {session_id}. Ensure the microcontroller is actively running experiments and has logged them to MongoDB with the correct session ID"
+        ), f"No results found for session ID: {session_id}. Ensure the microcontroller is actively running experiments and has logged them to the API Gateway with the correct session ID"
 
-        # Create pandas DataFrame from database
+        # Create pandas DataFrame from API Gateway results
         df = pd.json_normalize(results).set_index("_id").round(n_decimals)
 
         check_df = pd.read_csv(csv_fname).set_index("_id").round(n_decimals)
@@ -353,6 +351,11 @@ def test_orchestrator_client():
             course_id_key: course_id,
             "command_topic": command_topic,
             "sensor_data_topic": sensor_data_topic,
+            aws_api_gateway_url_key: (
+                os.environ[aws_api_gateway_url_key] if len(os.environ[aws_api_gateway_url_key]) < 4
+                else os.environ[aws_api_gateway_url_key][:2] + "*" * (len(os.environ[aws_api_gateway_url_key]) - 4) + os.environ[aws_api_gateway_url_key][-2:]
+            ),
+            aws_api_key_key: "*" * len(os.environ[aws_api_key_key]),
         }
         raise Exception(
             f"{e}. Please check {script_name} and refer back to the README. For reference, the following (blinded) credentials were used during this run: \n{pformat(blinded_credentials)}\n"  # noqa: E501

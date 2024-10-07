@@ -1,7 +1,5 @@
 # Description: Send commands to HiveMQ and receive sensor data from HiveMQ
 
-# NOTE: for this to work properly, you are expected to be running the
-# microcontroller.py script on your Pico W
 import os
 import json
 import secrets
@@ -17,8 +15,7 @@ import paho.mqtt.client as paho
 from ax.service.ax_client import AxClient, ObjectiveProperties
 import plotly.graph_objects as go
 from sklearn.metrics import mean_absolute_error
-
-from pymongo.mongo_client import MongoClient
+import requests
 
 course_id = os.environ["COURSE_ID"]
 
@@ -26,17 +23,15 @@ username = os.environ["HIVEMQ_USERNAME"]
 password = os.environ["HIVEMQ_PASSWORD"]
 host = os.environ["HIVEMQ_HOST"]
 
-cluster_name = os.environ["CLUSTER_NAME"]
-database_name = os.environ["DATABASE_NAME"]
-collection_name = os.environ["COLLECTION_NAME"]
-connection_string = os.environ["CONNECTION_STRING"]
+aws_api_gateway_url = os.environ["AWS_API_GATEWAY_URL"]
+aws_api_key = os.environ["AWS_API_KEY"]
 
 # Topics
 neopixel_topic = f"{course_id}/neopixel"
 as7341_topic = f"{course_id}/as7341"
 
 # create random session id to keep track of the session and filter out old data
-session_id = ...  # IMPLEMENT
+session_id = secrets.token_hex(16)  # IMPLEMENT
 
 with open("session_id.txt", "w") as f:  # for autograding
     f.write(session_id)  # for autograding
@@ -276,6 +271,21 @@ for _ in range(num_iter):
     results = evaluate(parameterization)
     ax_client.complete_trial(trial_index=trial_index, raw_data=results)
 
+    # Send results to AWS API Gateway
+    payload = {
+        "session_id": session_id,
+        "experiment_id": results_dicts[-1]["experiment_id"],
+        "command": results_dicts[-1]["command"],
+        "sensor_data": results_dicts[-1]["sensor_data"],
+        "mae": results_dicts[-1]["mae"]
+    }
+    response = requests.post(
+        aws_api_gateway_url,
+        headers={"x-api-key": aws_api_key, "Content-Type": "application/json"},
+        json=payload
+    )
+    if response.status_code != 200:
+        print(f"Failed to send data to API Gateway. Status code: {response.status_code}")
 
 best_parameters, metrics = ax_client.get_best_parameters()
 
@@ -296,14 +306,12 @@ print(f"Color misfit: {np.round(true_mismatch, 1)}")
 # get the AxClient's optimization trace using the built-in plotting method (objective_optimum can be left off)
 optimization_trace = ...  # IMPLEMENT
 
-
 def to_plotly(axplotconfig):
     """Converts AxPlotConfig to plotly Figure."""
     data = axplotconfig[0]["data"]
     layout = axplotconfig[0]["layout"]
     fig = go.Figure({"data": data, "layout": layout})
     return fig
-
 
 # Convert the optimization trace to a Plotly figure and save it as an image
 fig = to_plotly(optimization_trace)
@@ -323,14 +331,29 @@ with open("results.json", "w") as f:
 
 # %% Data logging
 
+# Function to get results from API Gateway
+def get_results_from_api_gateway(session_id):
+    url = aws_api_gateway_url
+    headers = {
+        "x-api-key": aws_api_key,
+        "Content-Type": "application/json"
+    }
+    params = {"session_id": session_id}
+    response = requests.get(url, headers=headers, params=params)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception(f"Failed to retrieve data from API Gateway. Status code: {response.status_code}")
+
 # get all results that have the same session ID as this run
 ...  # IMPLEMENT
 
-# Create a flattened pandas DataFrame from database
+# Create a flattened pandas DataFrame from API Gateway results
 ...  # IMPLEMENT
 
 # Export to results.csv file
 ...  # IMPLEMENT
 
-# Close the client
-...  # IMPLEMENT
+# Close the MQTT client
+mqtt_client.disconnect()
+mqtt_client.loop_stop()
