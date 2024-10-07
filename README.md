@@ -21,8 +21,10 @@ For this assignment, you will need to add the [GitHub repository secrets](https:
 | `CLUSTER_NAME`      | The name of your MongoDB cluster |
 | `DATABASE_NAME`     | The name of your database within the cluster |
 | `COLLECTION_NAME`   | The name of the collection from your database |
-| `ENDPOINT_BASE_URL` | The base URL of the Data API endpoint for the microcontroller to use |
-| `DATA_API_KEY`      | The Data API key for the microcontroller to access the cluster's data |
+| `AWS_ACCESS_KEY_ID` | Your AWS access key ID |
+| `AWS_SECRET_ACCESS_KEY` | Your AWS secret access key |
+| `AWS_REGION`        | The AWS region of your DynamoDB table |
+| `DYNAMODB_TABLE_NAME` | The name of your DynamoDB table |
 | `CONNECTION_STRING` | The connection string for the Python orchestrator to connect to MongoDB |
 
 Navigate to your GitHub assignment repository. The link will be of the form `https://github.com/ACC-HelloWorld/6-connecting-the-pieces-GITHUB_USERNAME`, where `GITHUB_USERNAME` is replaced with your own (e.g., `sgbaird`).
