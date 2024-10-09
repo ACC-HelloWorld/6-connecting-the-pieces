@@ -26,8 +26,23 @@ jobs:
           echo "export DATABASE_NAME=\"${{ secrets.DATABASE_NAME }}\"" >> setenv.sh
           echo "export COLLECTION_NAME=\"${{ secrets.COLLECTION_NAME }}\"" >> setenv.sh
           echo "export CLUSTER_NAME=\"${{ secrets.CLUSTER_NAME }}\"" >> setenv.sh
-          echo "export DATA_API_KEY=\"${{ secrets.DATA_API_KEY }}\"" >> setenv.sh
-          echo "export ENDPOINT_BASE_URL=\"${{ secrets.ENDPOINT_BASE_URL }}\"" >> setenv.sh
+          echo "export AWS_ACCESS_KEY_ID=\"${{ secrets.AWS_ACCESS_KEY_ID }}\"" >> setenv.sh
+          echo "export AWS_SECRET_ACCESS_KEY=\"${{ secrets.AWS_SECRET_ACCESS_KEY }}\"" >> setenv.sh
+          echo "export AWS_REGION=\"${{ secrets.AWS_REGION }}\"" >> setenv.sh
+          echo "export DYNAMODB_TABLE_NAME=\"${{ secrets.DYNAMODB_TABLE_NAME }}\"" >> setenv.sh
+          echo "export CONNECTION_STRING=\"${{ secrets.CONNECTION_STRING }}\"
           echo "export CONNECTION_STRING=\"${{ secrets.CONNECTION_STRING }}\"" >> setenv.sh
-          chmod +x setenv.sh
       - uses: education/autograding@v1
+        env:
+          COURSE_ID: ${{ secrets.COURSE_ID }}
+          HIVEMQ_HOST: ${{ secrets.HIVEMQ_HOST }}
+          HIVEMQ_PASSWORD: ${{ secrets.HIVEMQ_PASSWORD }}
+          HIVEMQ_USERNAME: ${{ secrets.HIVEMQ_USERNAME }}
+          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+          COLLECTION_NAME: ${{ secrets.COLLECTION_NAME }}
+          CLUSTER_NAME: ${{ secrets.CLUSTER_NAME }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          DYNAMODB_TABLE_NAME: ${{ secrets.DYNAMODB_TABLE_NAME }}
+          CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}

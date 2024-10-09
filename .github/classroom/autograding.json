@@ -21,9 +21,9 @@
             "points": 2
         },
         {
-            "name": "MongoDB Credentials (Data API)",
+            "name": "AWS Credentials Test",
             "setup": "sudo -H pip3 install -r requirements.txt",
-            "run": ". ./setenv.sh && pytest credentials_test.py::test_data_api",
+            "run": ". ./setenv.sh && pytest credentials_test.py::test_aws_credentials",
             "input": "",
             "output": "",
             "comparison": "exact",

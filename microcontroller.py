@@ -7,7 +7,7 @@ import asyncio
 import ntptime
 from uio import StringIO
 from time import time, sleep
-import urequests_2 as requests  # for MongoDB Data API
+import urequests_2 as requests  # for AWS API
 
 # WiFi
 from netman import connectWiFi
@@ -27,11 +27,10 @@ from my_secrets import (
     HIVEMQ_HOST,
     HIVEMQ_PASSWORD,
     HIVEMQ_USERNAME,
-    DATA_API_KEY,
-    ENDPOINT_BASE_URL,
-    CLUSTER_NAME,
-    DATABASE_NAME,
-    COLLECTION_NAME,
+    AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY,
+    AWS_REGION,
+    DYNAMODB_TABLE_NAME,
 )
 
 # Instantiate the LEDs with 1 pixel on Pin 28
@@ -156,6 +155,7 @@ def log_experiment(document):
     >>> log_experiment(document)
     """
     ...  # IMPLEMENT
+         # AWS API Gateway endpoint URL
 
 
 # MQTT Topics

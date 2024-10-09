@@ -3,7 +3,8 @@ import json
 from communication import hivemq_communication
 import os
 from pymongo.mongo_client import MongoClient
-import requests
+import boto3
+from botocore.exceptions import ClientError
 
 course_id_key = "COURSE_ID"
 
@@ -17,9 +18,11 @@ database_key = "DATABASE_NAME"
 collection_key = "COLLECTION_NAME"
 cluster_name_key = "CLUSTER_NAME"
 
-# data API specific
-data_api_key_key = "DATA_API_KEY"
-endpoint_base_url_key = "ENDPOINT_BASE_URL"
+# AWS specific
+aws_access_key_id_key = "AWS_ACCESS_KEY_ID"
+aws_secret_access_key_key = "AWS_SECRET_ACCESS_KEY"
+aws_region_key = "AWS_REGION"
+dynamodb_table_name_key = "DYNAMODB_TABLE_NAME"
 
 # For PyMongo
 connection_string_key = "CONNECTION_STRING"
@@ -34,8 +37,10 @@ def test_env_vars_exist():
         database_key,
         collection_key,
         cluster_name_key,
-        data_api_key_key,
-        endpoint_base_url_key,
+        aws_access_key_id_key,
+        aws_secret_access_key_key,
+        aws_region_key,
+        dynamodb_table_name_key,
         connection_string_key,
     ]:
         assert (
@@ -150,8 +155,43 @@ def test_data_api():
     ), f"Received status code {status_code} and message {txt}. Failed to add {document} to {cluster_name}:{database_name}:{collection_name} via {endpoint_base_url}."
 
 
+def test_aws_credentials():
+    try:
+        # Create a DynamoDB client
+        dynamodb = boto3.client('dynamodb',
+                                aws_access_key_id=os.environ[aws_access_key_id_key],
+                                aws_secret_access_key=os.environ[aws_secret_access_key_key],
+                                region_name=os.environ[aws_region_key])
+        
+        # Try to describe the table
+        table_name = os.environ[dynamodb_table_name_key]
+        response = dynamodb.describe_table(TableName=table_name)
+        
+        print(f"Successfully connected to DynamoDB table: {table_name}")
+        
+        # Test item insertion
+        test_item = {
+            'id': {'S': 'test-item'},
+            'data': {'S': 'test-data'}
+        }
+        dynamodb.put_item(TableName=table_name, Item=test_item)
+        print("Successfully inserted test item into DynamoDB table")
+        
+        # Test item retrieval
+        response = dynamodb.get_item(TableName=table_name, Key={'id': {'S': 'test-item'}})
+        assert response['Item']['data']['S'] == 'test-data', "Retrieved item does not match inserted item"
+        print("Successfully retrieved test item from DynamoDB table")
+        
+        # Delete test item
+        dynamodb.delete_item(TableName=table_name, Key={'id': {'S': 'test-item'}})
+        print("Successfully deleted test item from DynamoDB table")
+        
+    except ClientError as e:
+        print(f"Error: {e}")
+        assert False, f"Failed to connect to DynamoDB or perform operations. Check your AWS credentials and DynamoDB table name."
+
 if __name__ == "__main__":
     test_env_vars_exist()
     test_basic_hivemq_communication()
-    test_connection()
-    test_data_api()
+    test_connection()  # This still tests MongoDB connection
+    test_aws_credentials()  # New test for AWS credentials
