@@ -23,9 +23,9 @@ For this assignment, you will need to add the [GitHub repository secrets](https:
 | `COLLECTION_NAME`   | The name of the collection from your database |
 | `AWS_ACCESS_KEY_ID` | Your AWS access key ID |
 | `AWS_SECRET_ACCESS_KEY` | Your AWS secret access key |
-| `AWS_REGION`        | The AWS region of your DynamoDB table |
-| `DYNAMODB_TABLE_NAME` | The name of your DynamoDB table |
 | `CONNECTION_STRING` | The connection string for the Python orchestrator to connect to MongoDB |
+
+> **Note**: The variables `AWS_REGION` and `DYNAMODB_TABLE_NAME` are not required for this assignment unless specified otherwise. Please consult with your instructor if you have any questions regarding their necessity.
 
 Navigate to your GitHub assignment repository. The link will be of the form `https://github.com/ACC-HelloWorld/6-connecting-the-pieces-GITHUB_USERNAME`, where `GITHUB_USERNAME` is replaced with your own (e.g., `sgbaird`).
 
@@ -157,3 +157,20 @@ See `postCreateCommand` from [`devcontainer.json`](.devcontainer/devcontainer.js
 `pytest`
 
 You can also use the "Testing" sidebar extension to easily run individual tests. NOTE: For local testing, you may need to run `orchestrator_test.py` directly as a Python script rather than via `pytest` due to the interaction between subprocesses and the testing framework. We recommend running `orchestrator.py` directly as an additional debugging and troubleshooting step.
+
+## Additional Information
+
+### Understanding AWS Message Structure
+
+When working with AWS services, especially when sending messages, it's important to understand how these messages are structured. Messages often consist of several layers, including JSON strings and other data formats. Here are some key points to consider:
+
+1. **JSON Structure**: Messages are typically formatted as JSON strings. This allows for easy serialization and deserialization of data.
+
+2. **Layers of Data**: Messages can have multiple layers, where a JSON object might contain other JSON objects or arrays. This hierarchical structure helps in organizing complex data.
+
+3. **Keyword Arguments**: When sending messages, you might need to specify certain keyword arguments, such as `body`. This is often required when using AWS SDKs or APIs to ensure the message is correctly formatted and sent.
+
+4. **Automatic vs. Manual**: Some AWS services automatically handle certain aspects of message formatting, while others require manual specification. For example, when using AWS Lambda or SQS, you might need to manually specify the `body` of the message.
+
+5. **Best Practices**: Always refer to the AWS documentation for the specific service you are using to understand the required message format and any necessary keyword arguments.
+
