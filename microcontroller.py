@@ -2,7 +2,12 @@
 
 import sys
 import json
-import ussl
+
+try:
+    import ussl
+except:
+    import ssl
+
 import asyncio
 import ntptime
 from uio import StringIO
