@@ -21,13 +21,9 @@ For this assignment, you will need to add the [GitHub repository secrets](https:
 | `CLUSTER_NAME`      | The name of your MongoDB cluster |
 | `DATABASE_NAME`     | The name of your database within the cluster |
 | `COLLECTION_NAME`   | The name of the collection from your database |
-| `AWS_ACCESS_KEY_ID` | Your AWS access key ID |
-| `AWS_SECRET_ACCESS_KEY` | Your AWS secret access key |
-| `CONNECTION_STRING` | The connection string for the Python orchestrator to connect to MongoDB |
+| `CONNECTION_STRING` | The connection string for MongoDB connection |
 
-> **Note**: The variables `AWS_REGION` and `DYNAMODB_TABLE_NAME` are not required for this assignment unless specified otherwise. Please consult with your instructor if you have any questions regarding their necessity.
-
-Navigate to your GitHub assignment repository. The link will be of the form `https://github.com/ACC-HelloWorld/6-connecting-the-pieces-GITHUB_USERNAME`, where `GITHUB_USERNAME` is replaced with your own (e.g., `sgbaird`).
+Navigate to your GitHub assignment repository. The link will be of the form `https://github.com/ACC-HelloWorld/6-connecting-the-pieces-GITHUB_USERNAME`, where `GITHUB_USERNAME` is replaced with your own (e.g., `sgbaird`).
 
 Refer to previous tutorials and assignments for details on creating, accessing, and adding each of these credentials. While tedious, this approach is a one-time setup that simplifies the development and autograding process while adhering to security best practices. Your `COURSE_ID` can be accessed from the main course website by referencing the corresponding quiz response from the orientation module.
 

@@ -159,8 +159,17 @@ def log_experiment(document):
     ... }
     >>> log_experiment(document)
     """
-    ...  # IMPLEMENT
-         # AWS API Gateway endpoint URL
+    # TODO: Convert document to JSON string using json.dumps()
+    # Hint: json_data = json.dumps(...)
+    ...
+
+    # TODO: Send POST request to MongoDB API endpoint
+    # Hint: Use requests.post() with appropriate headers and data
+    ...
+
+    # TODO: Check if request was successful (status_code == 200)
+    # Hint: Print error message if request failed
+    ...
 
 
 # MQTT Topics

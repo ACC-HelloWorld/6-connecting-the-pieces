@@ -323,14 +323,26 @@ with open("results.json", "w") as f:
 
 # %% Data logging
 
-# get all results that have the same session ID as this run
-...  # IMPLEMENT
+# TODO: Create MongoDB client using connection string
+# Hint: client = MongoClient(...)
+...
 
-# Create a flattened pandas DataFrame from database
-...  # IMPLEMENT
+# TODO: Get database and collection objects
+# Hint: Use client[database_name] and db[collection_name]
+...
 
-# Export to results.csv file
-...  # IMPLEMENT
+# TODO: Query documents with matching session_id
+# Hint: Use collection.find({"session_id": session_id})
+results = ...
 
-# Close the client
-...  # IMPLEMENT
+# TODO: Create pandas DataFrame from results
+# Hint: Use pd.json_normalize()
+df = ...
+
+# TODO: Export DataFrame to CSV file
+# Hint: Use df.to_csv()
+...
+
+# TODO: Close MongoDB client
+# Hint: Use client.close()
+...
