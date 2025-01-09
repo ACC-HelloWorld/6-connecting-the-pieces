@@ -38,8 +38,8 @@ as7341_topic = f"{course_id}/as7341"
 # create random session id to keep track of the session and filter out old data
 session_id = ...  # IMPLEMENT
 
-with open("session_id.txt", "w") as f:  # for autograding
-    f.write(session_id)  # for autograding
+with open("session_id.txt", "w") as f:  
+    f.write(session_id)  
 
 num_iter = 20
 target_command = {"R": 38, "G": 79, "B": 63}
@@ -324,12 +324,13 @@ with open("results.json", "w") as f:
 # %% Data logging
 
 # TODO: Create MongoDB client using connection string
-# Hint: client = MongoClient(...)
-...
+# Hint: Use MongoClient(connection_string)
+client = ...
 
 # TODO: Get database and collection objects
 # Hint: Use client[database_name] and db[collection_name]
-...
+db = ...
+collection = ...
 
 # TODO: Query documents with matching session_id
 # Hint: Use collection.find({"session_id": session_id})

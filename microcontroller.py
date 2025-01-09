@@ -12,7 +12,6 @@ import asyncio
 import ntptime
 from uio import StringIO
 from time import time, sleep
-import urequests_2 as requests  # for AWS API
 
 # WiFi
 from netman import connectWiFi
@@ -32,10 +31,6 @@ from my_secrets import (
     HIVEMQ_HOST,
     HIVEMQ_PASSWORD,
     HIVEMQ_USERNAME,
-    AWS_ACCESS_KEY_ID,
-    AWS_SECRET_ACCESS_KEY,
-    AWS_REGION,
-    DYNAMODB_TABLE_NAME,
 )
 
 # Instantiate the LEDs with 1 pixel on Pin 28
@@ -125,16 +120,16 @@ def run_color_experiment(R, G, B):
 
 def log_experiment(document):
     """
-    Sends an experiment document to a specified MongoDB collection.
-
-    This function attempts to send a document to a MongoDB collection via a POST
-    request.
+    Sends an experiment document to MongoDB via HTTP POST request.
 
     Parameters
     ----------
     document : dict
-        The document to be added to the MongoDB collection. This should be a
-        dictionary representing the experiment to be logged.
+        The document to be added to MongoDB. Should contain:
+        - command: dict with RGB values
+        - experiment_id: str
+        - session_id: str 
+        - sensor_data: dict with sensor readings
 
     Returns
     -------

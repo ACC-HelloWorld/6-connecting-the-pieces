@@ -105,7 +105,18 @@ NOTE: the code above assumes the values are all numeric.
 
 #### Data logging
 
-After the optimization is complete, the orchestrator should pull all results from the MongoDB database, read it into a pandas DataFrame, and save the data to a CSV file.
+The data logging happens at two levels:
+
+1. **Microcontroller Level**:
+   - After each experiment, the microcontroller logs the results to MongoDB via HTTP POST request
+   - Each log includes the command (RGB values), experiment ID, session ID, and sensor data
+
+2. **Orchestrator Level**:
+   - After optimization is complete, the orchestrator:
+     - Connects to MongoDB using PyMongo
+     - Retrieves all results matching the current session ID
+     - Creates a pandas DataFrame from the results
+     - Saves the data to a CSV file
 
 ### Microcontroller
 
@@ -143,7 +154,13 @@ print(payload_dict)
 
 #### Data logging
 
-The microcontroller should log the results at the end of each experiment to the MongoDB database. The results dictionary should include the original payload and the sensor data that was acquired.
+The microcontroller should log each experiment's results to MongoDB immediately after completion. Each log should include:
+- The original command (RGB values)
+- Experiment ID for tracking
+- Session ID for grouping related experiments
+- Sensor data from all channels
+
+The data is sent via HTTP POST request to ensure reliable transmission even from the limited MicroPython environment.
 
 ## Setup command
 
