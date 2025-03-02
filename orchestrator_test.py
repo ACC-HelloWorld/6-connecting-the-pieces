@@ -196,7 +196,7 @@ def test_orchestrator_client():
 
         client.loop_stop()
 
-        sleep(60)
+        sleep(30)
 
         def to_sorted_rounded_frozenset_list(dict_list):
             rounded_dict_list = []
@@ -288,9 +288,9 @@ def test_orchestrator_client():
 
         database_name = os.environ["DATABASE_NAME"]
         collection_name = os.environ["COLLECTION_NAME"]
-        connection_string = os.environ["CONNECTION_STRING"]
+        atlas_uri = os.environ["ATLAS_URI"]
 
-        db_client = MongoClient(connection_string)
+        db_client = MongoClient(atlas_uri)
 
         # Send a ping to confirm a successful connection
         try:
@@ -316,9 +316,6 @@ def test_orchestrator_client():
         df = pd.json_normalize(results).set_index("_id").round(n_decimals)
 
         check_df = pd.read_csv(csv_fname).set_index("_id").round(n_decimals)
-
-        if "Unnamed: 0" in check_df.columns:
-            check_df = check_df.drop(columns=["Unnamed: 0"])
 
         # Select only the columns of df that are present in check_df, round, and drop duplicates
         df_selected = df[check_df.columns].round(n_decimals).drop_duplicates()
