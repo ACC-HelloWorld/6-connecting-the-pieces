@@ -12,18 +12,16 @@ For this assignment, you will need to add the [GitHub repository secrets](https:
 
 **The secrets to be added to GitHub Actions and Codespaces are:**
 
-| Variable Name       | Description |
-|---------------------|-------------|
-| `COURSE_ID`         | Your student identifier for the course |
-| `HIVEMQ_HOST`       | The HiveMQ cluster host URL |
-| `HIVEMQ_USERNAME`   | The HiveMQ username |
-| `HIVEMQ_PASSWORD`   | The HiveMQ password |
-| `CLUSTER_NAME`      | The name of your MongoDB cluster |
-| `DATABASE_NAME`     | The name of your database within the cluster |
-| `COLLECTION_NAME`   | The name of the collection from your database |
-| `ENDPOINT_BASE_URL` | The base URL of the Data API endpoint for the microcontroller to use |
-| `DATA_API_KEY`      | The Data API key for the microcontroller to access the cluster's data |
-| `CONNECTION_STRING` | The connection string for the Python orchestrator to connect to MongoDB |
+| Variable Name         | Description                                                                                                                                                    |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `COURSE_ID`           | Your student identifier for the course                                                                                                                         |
+| `HIVEMQ_HOST`         | The HiveMQ cluster host URL                                                                                                                                    |
+| `HIVEMQ_USERNAME`     | The HiveMQ username                                                                                                                                            |
+| `HIVEMQ_PASSWORD`     | The HiveMQ password                                                                                                                                            |
+| `DATABASE_NAME`       | The name of your database within the cluster                                                                                                                   |
+| `COLLECTION_NAME`     | The name of the collection from your database                                                                                                                  |
+| `LAMBDA_FUNCTION_URL` | The Lambda Function URL that acts as an intermediate layer between the microcontroller and the orchestrator                                                    |
+| `ATLAS_URI`           | The MongoDB Atlas universal resource identifier (URI) for the Python orchestrator to connect to MongoDB (also referred to by MongoDB as the connection string) |
 
 Navigate to your GitHub assignment repository. The link will be of the form `https://github.com/ACC-HelloWorld/6-connecting-the-pieces-GITHUB_USERNAME`, where `GITHUB_USERNAME` is replaced with your own (e.g., `sgbaird`).
 
