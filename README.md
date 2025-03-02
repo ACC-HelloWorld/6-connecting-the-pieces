@@ -21,11 +21,9 @@ For this assignment, you will need to add the [GitHub repository secrets](https:
 | `CLUSTER_NAME`      | The name of your MongoDB cluster |
 | `DATABASE_NAME`     | The name of your database within the cluster |
 | `COLLECTION_NAME`   | The name of the collection from your database |
-| `ENDPOINT_BASE_URL` | The base URL of the Data API endpoint for the microcontroller to use |
-| `DATA_API_KEY`      | The Data API key for the microcontroller to access the cluster's data |
-| `CONNECTION_STRING` | The connection string for the Python orchestrator to connect to MongoDB |
+| `CONNECTION_STRING` | The connection string for MongoDB connection |
 
-Navigate to your GitHub assignment repository. The link will be of the form `https://github.com/ACC-HelloWorld/6-connecting-the-pieces-GITHUB_USERNAME`, where `GITHUB_USERNAME` is replaced with your own (e.g., `sgbaird`).
+Navigate to your GitHub assignment repository. The link will be of the form `https://github.com/ACC-HelloWorld/6-connecting-the-pieces-GITHUB_USERNAME`, where `GITHUB_USERNAME` is replaced with your own (e.g., `sgbaird`).
 
 Refer to previous tutorials and assignments for details on creating, accessing, and adding each of these credentials. While tedious, this approach is a one-time setup that simplifies the development and autograding process while adhering to security best practices. Your `COURSE_ID` can be accessed from the main course website by referencing the corresponding quiz response from the orientation module.
 
@@ -107,7 +105,18 @@ NOTE: the code above assumes the values are all numeric.
 
 #### Data logging
 
-After the optimization is complete, the orchestrator should pull all results from the MongoDB database, read it into a pandas DataFrame, and save the data to a CSV file.
+The data logging happens at two levels:
+
+1. **Microcontroller Level**:
+   - After each experiment, the microcontroller logs the results to MongoDB via HTTP POST request
+   - Each log includes the command (RGB values), experiment ID, session ID, and sensor data
+
+2. **Orchestrator Level**:
+   - After optimization is complete, the orchestrator:
+     - Connects to MongoDB using PyMongo
+     - Retrieves all results matching the current session ID
+     - Creates a pandas DataFrame from the results
+     - Saves the data to a CSV file
 
 ### Microcontroller
 
@@ -145,7 +154,13 @@ print(payload_dict)
 
 #### Data logging
 
-The microcontroller should log the results at the end of each experiment to the MongoDB database. The results dictionary should include the original payload and the sensor data that was acquired.
+The microcontroller should log each experiment's results to MongoDB immediately after completion. Each log should include:
+- The original command (RGB values)
+- Experiment ID for tracking
+- Session ID for grouping related experiments
+- Sensor data from all channels
+
+The data is sent via HTTP POST request to ensure reliable transmission even from the limited MicroPython environment.
 
 ## Setup command
 
@@ -155,3 +170,20 @@ See `postCreateCommand` from [`devcontainer.json`](.devcontainer/devcontainer.js
 `pytest`
 
 You can also use the "Testing" sidebar extension to easily run individual tests. NOTE: For local testing, you may need to run `orchestrator_test.py` directly as a Python script rather than via `pytest` due to the interaction between subprocesses and the testing framework. We recommend running `orchestrator.py` directly as an additional debugging and troubleshooting step.
+
+## Additional Information
+
+### Understanding AWS Message Structure
+
+When working with AWS services, especially when sending messages, it's important to understand how these messages are structured. Messages often consist of several layers, including JSON strings and other data formats. Here are some key points to consider:
+
+1. **JSON Structure**: Messages are typically formatted as JSON strings. This allows for easy serialization and deserialization of data.
+
+2. **Layers of Data**: Messages can have multiple layers, where a JSON object might contain other JSON objects or arrays. This hierarchical structure helps in organizing complex data.
+
+3. **Keyword Arguments**: When sending messages, you might need to specify certain keyword arguments, such as `body`. This is often required when using AWS SDKs or APIs to ensure the message is correctly formatted and sent.
+
+4. **Automatic vs. Manual**: Some AWS services automatically handle certain aspects of message formatting, while others require manual specification. For example, when using AWS Lambda or SQS, you might need to manually specify the `body` of the message.
+
+5. **Best Practices**: Always refer to the AWS documentation for the specific service you are using to understand the required message format and any necessary keyword arguments.
+

@@ -1,58 +1,8 @@
 import os
-import re
-import pandas as pd
-from pathlib import Path
-
-from time import time, sleep
 import json
-import subprocess
-import warnings
-import paho.mqtt.client as mqtt_client
-from pprint import pformat
-import threading
-
-from ax.service.ax_client import AxClient
-
+import pandas as pd
 from pymongo.mongo_client import MongoClient
-
-username_key = "HIVEMQ_USERNAME"
-password_key = "HIVEMQ_PASSWORD"
-host_key = "HIVEMQ_HOST"
-course_id_key = "COURSE_ID"
-
-sensor_data_fname = "results.json"
-payload_dict_fname = "payload_dicts.json"
-ax_client_fname = "ax_client_snapshot.json"
-
-n_decimals = 4
-
-
-def flatten_dict(d, parent_key="", sep="_"):
-    items = []
-    for k, v in d.items():
-        new_key = f"{parent_key}{sep}{k}" if parent_key else k
-        if isinstance(v, dict):
-            items.extend(flatten_dict(v, new_key, sep=sep).items())
-        else:
-            items.append((new_key, v))
-    flattened = dict(items)
-    if len(items) != len(set(k for k, v in items)):
-        raise ValueError("Overlapping keys encountered.")
-    return flattened
-
-
-def run_color_experiment(R, G, B):
-    """Dummy function for receiving R, G, B values and returning sensor data."""
-    wavelengths = [410, 440, 470, 510, 550, 583, 620, 670]
-    rw = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.9, 1.0]
-    gw = [0.2, 0.4, 0.6, 0.8, 1.0, 0.8, 0.4, 0.2]
-    bw = [0.9, 1.0, 0.8, 0.6, 0.4, 0.2, 0.1, 0.0]
-    sensor_data = {
-        f"ch{wavelength}": rw[i] * R + gw[i] * G + bw[i] * B
-        for i, wavelength in enumerate(wavelengths)
-    }
-    return sensor_data
-
+from communication import to_sorted_rounded_frozenset_list
 
 def test_orchestrator_client():
     """Pretend to be the microcontroller"""

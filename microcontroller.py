@@ -8,6 +8,7 @@ try:
 except:
     import ussl as ssl
 
+
 import asyncio
 import ntptime
 from uio import StringIO
@@ -131,8 +132,11 @@ def log_experiment(document):
     Parameters
     ----------
     document : dict
-        The document to be added to the MongoDB collection. This should be a
-        dictionary representing the experiment to be logged.
+        The document to be added to MongoDB. Should contain:
+        - command: dict with RGB values
+        - experiment_id: str
+        - session_id: str 
+        - sensor_data: dict with sensor readings
 
     Returns
     -------
@@ -157,7 +161,17 @@ def log_experiment(document):
     ... }
     >>> log_experiment(document)
     """
-    ...  # IMPLEMENT
+    # TODO: Convert document to JSON string using json.dumps()
+    # Hint: json_data = json.dumps(...)
+    ...
+
+    # TODO: Send POST request to MongoDB API endpoint
+    # Hint: Use requests.post() with appropriate headers and data
+    ...
+
+    # TODO: Check if request was successful (status_code == 200)
+    # Hint: Print error message if request failed
+    ...
 
 
 # MQTT Topics
