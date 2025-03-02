@@ -4,14 +4,16 @@ import sys
 import json
 
 try:
-    import ussl
-except:
     import ssl
+except:
+    import ussl as ssl
+
 
 import asyncio
 import ntptime
 from uio import StringIO
 from time import time, sleep
+import requests
 
 # WiFi
 from netman import connectWiFi
@@ -31,6 +33,9 @@ from my_secrets import (
     HIVEMQ_HOST,
     HIVEMQ_PASSWORD,
     HIVEMQ_USERNAME,
+    DATABASE_NAME,
+    COLLECTION_NAME,
+    LAMBDA_FUNCTION_URL,
 )
 
 # Instantiate the LEDs with 1 pixel on Pin 28
@@ -77,7 +82,7 @@ config.update(
             "server_side": False,
             "key": None,
             "cert": None,
-            "cert_reqs": ussl.CERT_REQUIRED,
+            "cert_reqs": ssl.CERT_REQUIRED,
             "cadata": cacert,
             "server_hostname": HIVEMQ_HOST,
         },
@@ -120,7 +125,9 @@ def run_color_experiment(R, G, B):
 
 def log_experiment(document):
     """
-    Sends an experiment document to MongoDB via HTTP POST request.
+    Sends an experiment document to a specified MongoDB collection.
+
+    This function attempts to send a document to a MongoDB collection via an AWS Lambda Function URL.
 
     Parameters
     ----------

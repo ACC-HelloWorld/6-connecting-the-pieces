@@ -16,16 +16,13 @@ host_key = "HIVEMQ_HOST"
 # general
 database_key = "DATABASE_NAME"
 collection_key = "COLLECTION_NAME"
-cluster_name_key = "CLUSTER_NAME"
 
-# AWS specific
-aws_access_key_id_key = "AWS_ACCESS_KEY_ID"
-aws_secret_access_key_key = "AWS_SECRET_ACCESS_KEY"
-aws_region_key = "AWS_REGION"
-dynamodb_table_name_key = "DYNAMODB_TABLE_NAME"
+# AWS Lambda
+lambda_function_url_key = "LAMBDA_FUNCTION_URL"
+
 
 # For PyMongo
-connection_string_key = "CONNECTION_STRING"
+atlas_uri_key = "ATLAS_URI"
 
 
 def test_env_vars_exist():
@@ -36,15 +33,11 @@ def test_env_vars_exist():
         host_key,
         database_key,
         collection_key,
-        cluster_name_key,
-        aws_access_key_id_key,
-        aws_secret_access_key_key,
-        aws_region_key,
-        dynamodb_table_name_key,
-        connection_string_key,
+        lambda_function_url_key,
+        atlas_uri_key,
     ]:
         assert (
-            env_var in os.environ and os.environ[env_var] != ""
+            env_var in os.environ
         ), f"Environment variable {env_var} does not exist. See README for instructions."
     default_broker = "248cc294c37642359297f75b7b023374.s2.eu.hivemq.cloud"
     assert (
@@ -70,8 +63,8 @@ def test_basic_hivemq_communication():
 
 def test_connection():
     # Create a new client and connect to the server
-    connection_string = os.environ[connection_string_key]
-    client = MongoClient(connection_string)
+    atlas_uri = os.environ[atlas_uri_key]
+    client = MongoClient(atlas_uri)
 
     # Send a ping to confirm a successful connection
     try:
@@ -82,11 +75,11 @@ def test_connection():
         success = False
         print(e)
 
-    assert success, f"""Could not connect to MongoDB using the following URI: {connection_string}. 
+    assert success, f"""Could not connect to MongoDB using the following URI: {atlas_uri}. 
     The URI should be of the format mongodb+srv://<username>:<password>@<cluster_name>.<cluster_id>.mongodb.net/?retryWrites=true&w=majority 
     where your cluster name and cluster ID can be found using the 'Connect' button interface on MongoDB Atlas. 
-    For example, if your username is `test-user-find-only`, password is `HGzZNsQ3vBLKrXXF`, cluster name is `test-cluster`, and cluster ID is `c5jgpni`, 
-    then your URI would be: mongodb+srv://sgbaird:HGzZNsQ3vBLKrXXF@test-cluster.c5jgpni.mongodb.net/?retryWrites=true&w=majority.
+    For example, if your username is `sgbaird`, password is `HGzZNsQ3vBLKrZXXF`, cluster name is `test-cluster`, and cluster ID is `c5jgpni`, 
+    then your URI would be: mongodb+srv://sgbaird:HGzZNsQ3vBLKrZXXF@test-cluster.c5jgpni.mongodb.net/?retryWrites=true&w=majority.
     Please check your environment variables and ensure your MongoDB database and collection are set up correctly."""
 
     # upload a test document
@@ -110,49 +103,37 @@ def test_connection():
     client.close()
 
 
-def test_data_api():
-    endpoint_base_url = os.environ[endpoint_base_url_key]
-    data_api_key = os.environ[data_api_key_key]
-    cluster_name = os.environ[cluster_name_key]
-    database_name = os.environ[database_key]
-    collection_name = os.environ[collection_key]
-    course_id = os.environ[course_id_key]
+def test_lambda_function_url():
+    LAMBDA_FUNCTION_URL = os.environ[lambda_function_url_key]
+    DATABASE_NAME = os.environ[database_key]
+    COLLECTION_NAME = os.environ[collection_key]
+    COURSE_ID = os.environ[course_id_key]
 
-    document = {"course_id": course_id}
+    document = {"course_id": COURSE_ID}
 
-    endpoint_url = f"{endpoint_base_url}/action/insertOne"
+    payload = {
+        "database": DATABASE_NAME,
+        "collection": COLLECTION_NAME,
+        "document": document,
+    }
 
-    num_retries = 3
-    for _ in range(num_retries):
-        response = requests.post(
-            endpoint_url,
-            headers={"api-key": data_api_key},
-            json={
-                "dataSource": cluster_name,
-                "database": database_name,
-                "collection": collection_name,
-                "document": document,
-            },
-        )
+    print(
+        f"sending {document} to {DATABASE_NAME}:{COLLECTION_NAME} via Lambda function URL"
+    )
 
-        print(
-            f"sending {document} to {cluster_name}:{database_name}:{collection_name} via {endpoint_base_url}"
-        )
+    response = requests.post(LAMBDA_FUNCTION_URL, json=payload)
 
-        txt = str(response.text)
-        status_code = response.status_code
+    txt = str(response.text)
+    status_code = response.status_code
 
-        print(f"Response: ({status_code}), msg = {txt}")
+    print(f"Response: ({status_code}), msg = {txt}")
 
-        if status_code == 201:
-            print("Added Successfully")
-            break
-
-        print("Retrying...")
+    if status_code == 200:
+        print("Added Successfully")
 
     assert (
-        status_code == 201
-    ), f"Received status code {status_code} and message {txt}. Failed to add {document} to {cluster_name}:{database_name}:{collection_name} via {endpoint_base_url}."
+        status_code == 200
+    ), f"Received status code {status_code} and message {txt}. Failed to add {document} to {DATABASE_NAME}:{COLLECTION_NAME} via Lambda function URL."
 
 
 def test_aws_credentials():
@@ -193,5 +174,5 @@ def test_aws_credentials():
 if __name__ == "__main__":
     test_env_vars_exist()
     test_basic_hivemq_communication()
-    test_connection()  # This still tests MongoDB connection
-    test_aws_credentials()  # New test for AWS credentials
+    test_connection()
+    test_lambda_function_url()
