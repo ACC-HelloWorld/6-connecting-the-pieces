@@ -8,6 +8,7 @@ try:
 except:
     import ussl as ssl
 
+
 import asyncio
 import ntptime
 from uio import StringIO
@@ -131,8 +132,11 @@ def log_experiment(document):
     Parameters
     ----------
     document : dict
-        The document to be added to the MongoDB collection. This should be a
-        dictionary representing the experiment to be logged.
+        The document to be added to MongoDB. Should contain:
+        - command: dict with RGB values
+        - experiment_id: str
+        - session_id: str
+        - sensor_data: dict with sensor readings
 
     Returns
     -------
