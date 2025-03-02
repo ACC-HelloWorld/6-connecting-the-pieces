@@ -3,8 +3,7 @@ import json
 from communication import hivemq_communication
 import os
 from pymongo.mongo_client import MongoClient
-import boto3
-from botocore.exceptions import ClientError
+import requests
 
 course_id_key = "COURSE_ID"
 
@@ -19,7 +18,6 @@ collection_key = "COLLECTION_NAME"
 
 # AWS Lambda
 lambda_function_url_key = "LAMBDA_FUNCTION_URL"
-
 
 # For PyMongo
 atlas_uri_key = "ATLAS_URI"
@@ -135,41 +133,6 @@ def test_lambda_function_url():
         status_code == 200
     ), f"Received status code {status_code} and message {txt}. Failed to add {document} to {DATABASE_NAME}:{COLLECTION_NAME} via Lambda function URL."
 
-
-def test_aws_credentials():
-    try:
-        # Create a DynamoDB client
-        dynamodb = boto3.client('dynamodb',
-                                aws_access_key_id=os.environ[aws_access_key_id_key],
-                                aws_secret_access_key=os.environ[aws_secret_access_key_key],
-                                region_name=os.environ[aws_region_key])
-        
-        # Try to describe the table
-        table_name = os.environ[dynamodb_table_name_key]
-        response = dynamodb.describe_table(TableName=table_name)
-        
-        print(f"Successfully connected to DynamoDB table: {table_name}")
-        
-        # Test item insertion
-        test_item = {
-            'id': {'S': 'test-item'},
-            'data': {'S': 'test-data'}
-        }
-        dynamodb.put_item(TableName=table_name, Item=test_item)
-        print("Successfully inserted test item into DynamoDB table")
-        
-        # Test item retrieval
-        response = dynamodb.get_item(TableName=table_name, Key={'id': {'S': 'test-item'}})
-        assert response['Item']['data']['S'] == 'test-data', "Retrieved item does not match inserted item"
-        print("Successfully retrieved test item from DynamoDB table")
-        
-        # Delete test item
-        dynamodb.delete_item(TableName=table_name, Key={'id': {'S': 'test-item'}})
-        print("Successfully deleted test item from DynamoDB table")
-        
-    except ClientError as e:
-        print(f"Error: {e}")
-        assert False, f"Failed to connect to DynamoDB or perform operations. Check your AWS credentials and DynamoDB table name."
 
 if __name__ == "__main__":
     test_env_vars_exist()

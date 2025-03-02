@@ -37,8 +37,8 @@ as7341_topic = f"{course_id}/as7341"
 # create random session id to keep track of the session and filter out old data
 session_id = ...  # IMPLEMENT
 
-with open("session_id.txt", "w") as f:  
-    f.write(session_id)  
+with open("session_id.txt", "w") as f:  # for autograding
+    f.write(session_id)  # for autograding
 
 num_iter = 20
 target_command = {"R": 38, "G": 79, "B": 63}
@@ -322,27 +322,14 @@ with open("results.json", "w") as f:
 
 # %% Data logging
 
-# TODO: Create MongoDB client using connection string
-# Hint: Use MongoClient(connection_string)
-client = ...
+# get all results that have the same session ID as this run
+...  # IMPLEMENT
 
-# TODO: Get database and collection objects
-# Hint: Use client[database_name] and db[collection_name]
-db = ...
-collection = ...
+# Create a flattened pandas DataFrame from database
+...  # IMPLEMENT
 
-# TODO: Query documents with matching session_id
-# Hint: Use collection.find({"session_id": session_id})
-results = ...
+# Export to results.csv file
+...  # IMPLEMENT
 
-# TODO: Create pandas DataFrame from results
-# Hint: Use pd.json_normalize()
-df = ...
-
-# TODO: Export DataFrame to CSV file
-# Hint: Use df.to_csv()
-...
-
-# TODO: Close MongoDB client
-# Hint: Use client.close()
-...
+# Close the client
+...  # IMPLEMENT
